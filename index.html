@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Parcycle. A JavaScript particle system</title>
+	<style type="text/css">
+		body { background-color: #fff; font-size:8pt; }
+		#canvas { background-color: #000; }
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="500" height="300"></canvas>
+	<br/>
+	Check my site for a more complete example of <a href="http://www.mrspeaker.net/dev/parcycle">Parcyle in action</a>
+	<script src="particle.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+		/* handle canvas mouse events and init */
+		window.addEventListener( "load", function(){
+			controller.init();
+		}, "false");
+		
+		// Test controller for the particle system.
+		var controller = {
+			canvas : null,
+			context : null,
+
+			init : function(){
+				this.canvas = document.getElementById( "canvas" );
+				this.context = this.canvas.getContext( "2d" );
+				this.context.globalCompositeOperation = "lighter"; //"source-over", "lighter", "darker", "xor"  are good
+
+				this.p1 = new cParticleSystem();
+				this.p2 = new cParticleSystem();	
+
+				// Set some properties - check the class
+				this.p2.position = Vector.create( 300, 190 );
+				this.p2.startColourRandom = [ 255, 255, 255, 1 ];
+				this.p2.endColourRandom = [ 255, 255, 255, 1 ];
+				this.p2.size = 20;
+				this.p2.maxParticles = 20;
+				this.p2.duration = 10;
+
+				this.p1.init();
+				this.p2.init();
+
+				this.main();
+			},
+
+			main : function(){
+				this.update();
+				this.draw();
+				setTimeout( function(){ controller.main(); }, 100 );
+			},
+
+			update : function(){	
+				this.p1.update( 1 ); // "1" is used as a delta... should be calculated as time between frames
+				this.p2.update( 1 );
+			},
+
+			draw : function(){
+				this.context.clearRect( 0, 0, 690, 452 );
+
+				this.p1.render( this.context );
+				this.p2.render( this.context );	 
+			}
+		};
+		
+	</script>
+</body>
+</html>

@@ -44,8 +44,8 @@ function cParticleSystem(){
 	this.gravity = Vector.create( 0.4, 0.2 );
 	this.startColour = [ 250, 218, 68, 1 ];
 	this.startColourRandom = [ 62, 60, 60, 0 ];
-	this.finishColour = [ 245, 35, 0, 0 ];  
-	this.finishColourRandom = [ 60, 60, 60, 0 ];
+	this.endColour = [ 245, 35, 0, 0 ];  
+	this.endColourRandom = [ 60, 60, 60, 0 ];
 	this.sharpness = 40;
 	this.sharpnessRandom = 10;
 
@@ -104,10 +104,10 @@ function cParticleSystem(){
 		];
 
 		var end = [
-			this.finishColour[ 0 ] + this.finishColourRandom[ 0 ] * RANDM1TO1(),
-			this.finishColour[ 1 ] + this.finishColourRandom[ 1 ] * RANDM1TO1(),
-			this.finishColour[ 2 ] + this.finishColourRandom[ 2 ] * RANDM1TO1(),
-			this.finishColour[ 3 ] + this.finishColourRandom[ 3 ] * RANDM1TO1()
+			this.endColour[ 0 ] + this.endColourRandom[ 0 ] * RANDM1TO1(),
+			this.endColour[ 1 ] + this.endColourRandom[ 1 ] * RANDM1TO1(),
+			this.endColour[ 2 ] + this.endColourRandom[ 2 ] * RANDM1TO1(),
+			this.endColour[ 3 ] + this.endColourRandom[ 3 ] * RANDM1TO1()
 		];
 
 	    particle.colour = start;

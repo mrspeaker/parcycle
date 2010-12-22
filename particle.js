@@ -56,6 +56,8 @@ function cParticleSystem(){
 	this.emitCounter = 0;
 	this.particleIndex = 0;
 	
+	var toRadians = Math.PI / 180;
+	
 	this.init = function(){
 		this.emissionRate = this.maxParticles / this.lifeSpan;
 		this.emitCounter = 0;
@@ -82,8 +84,37 @@ function cParticleSystem(){
 		particle.position.x = this.position.x + this.positionRandom.x * RANDM1TO1();
 		particle.position.y = this.position.y + this.positionRandom.y * RANDM1TO1();
 
-		var newAngle = (this.angle + this.angleRandom * RANDM1TO1() ) * ( Math.PI / 180 ); // convert to radians
-		var vector = Vector.create( Math.cos( newAngle ), Math.sin( newAngle ) ); // Could move to lookup for speed
+		var newAngle = (this.angle + this.angleRandom * RANDM1TO1() ) * toRadians; // convert to radians
+		
+		// speed up with a few cosine + sine tricks + magic numbers 
+		// wrap
+		var sin, cos;
+		if (newAngle < -3.14159265) {
+			newAngle += 6.28318531;
+		} else if (newAngle >  3.14159265) {
+			newAngle -= 6.28318531;
+		}
+		
+		// sine
+		if (newAngle < 0) {
+			sin = 1.27323954 * newAngle + .405284735 * newAngle * newAngle;
+		} else {
+			sin = 1.27323954 * newAngle - 0.405284735 * newAngle * newAngle;
+		}
+		
+		// cos(x) = sin(x + PI/2)
+		newAngle += 1.57079632;
+		if (newAngle > 3.14159265) {
+			newAngle -= 6.28318531;
+		}
+		
+		if (newAngle < 0) {
+			cos = 1.27323954 * newAngle + 0.405284735 * newAngle * newAngle
+		} else {
+			cos = 1.27323954 * newAngle - 0.405284735 * newAngle * newAngle;
+		}
+		
+		var vector = Vector.create( cos, sin ); // Could move to lookup for speed
 		var vectorSpeed = this.speed + this.speedRandom * RANDM1TO1();
 		particle.direction = Vector.multiply( vector, vectorSpeed );
 

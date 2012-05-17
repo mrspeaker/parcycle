@@ -151,12 +151,12 @@ function cParticleSystem(){
 				var a = currentParticle.colour[ 3 ] += ( currentParticle.deltaColour[ 3 ] * delta );
 				
 				// Calculate the rgba string to draw.
-				var draw = [];
-				draw.push("rgba(" + ( r > 255 ? 255 : r < 0 ? 0 : ~~r ) );
-				draw.push( g > 255 ? 255 : g < 0 ? 0 : ~~g );
-				draw.push( b > 255 ? 255 : b < 0 ? 0 : ~~b );
-				draw.push( (a > 1 ? 1 : a < 0 ? 0 : a.toFixed( 2 ) ) + ")");
-				currentParticle.drawColour = draw.join( "," );
+				var r = ( r > 255 ? 255 : r < 0 ? 0 : ~~r ),
+				g = ( g > 255 ? 255 : g < 0 ? 0 : ~~g ),
+				b = ( b > 255 ? 255 : b < 0 ? 0 : ~~b ),
+				a = (a > 1 ? 1 : a < 0 ? 0 : a.toFixed( 2 ) );
+				currentParticle.drawColour = 'rgba('+r+','+g+','+b+','+a+')';
+				currentParticle.drawColourTransparent = 'rgba('+r+','+g+','+b+',0)';
 				
 				this.particleIndex++;
 			} else {
@@ -185,7 +185,7 @@ function cParticleSystem(){
 					
 			var radgrad = context.createRadialGradient( x + halfSize, y + halfSize, particle.sizeSmall, x + halfSize, y + halfSize, halfSize);  
 			radgrad.addColorStop( 0, particle.drawColour );   
-			radgrad.addColorStop( 1, 'rgba(0,0,0,0)' ); //Super cool if you change these values (and add more colour stops)
+			radgrad.addColorStop( 1, particle.drawColourTransparent ); //Super cool if you change these values (and add more colour stops)
 			context.fillStyle = radgrad;
 		  	context.fillRect( x, y, size, size );
 		}
@@ -211,3 +211,4 @@ var Vector = {
 		return vector1;
 	}
 };
+

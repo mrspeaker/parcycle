@@ -56,6 +56,9 @@ function cParticleSystem(){
 	this.emitCounter = 0;
 	this.particleIndex = 0;
 	
+	// speed-ups
+	var toRadians = Math.PI / 180;
+	
 	this.init = function(){
 		this.emissionRate = this.maxParticles / this.lifeSpan;
 		this.emitCounter = 0;
@@ -82,10 +85,38 @@ function cParticleSystem(){
 		particle.position.x = this.position.x + this.positionRandom.x * RANDM1TO1();
 		particle.position.y = this.position.y + this.positionRandom.y * RANDM1TO1();
 
-		var newAngle = (this.angle + this.angleRandom * RANDM1TO1() ) * ( Math.PI / 180 ); // convert to radians
-		var vector = Vector.create( Math.cos( newAngle ), Math.sin( newAngle ) ); // Could move to lookup for speed
+		var newAngle = (this.angle + this.angleRandom * RANDM1TO1() ) * toRadians; // convert to radians
+		
+		// speed up with a few cosine + sine tricks + magic numbers 
+		// wrap
+		var sin, cos;
+		if (newAngle < -3.14159265) {
+			newAngle += 6.28318531;
+		} else if (newAngle >  3.14159265) {
+			newAngle -= 6.28318531;
+		}
+		
+		// sine
+		if (newAngle < 0) {
+			sin = 1.27323954 * newAngle + .405284735 * newAngle * newAngle;
+		} else {
+			sin = 1.27323954 * newAngle - 0.405284735 * newAngle * newAngle;
+		}
+		
+		// cos(x) = sin(x + PI/2)
+		newAngle += 1.57079632;
+		if (newAngle > 3.14159265) {
+			newAngle -= 6.28318531;
+		}
+		
+		if (newAngle < 0) {
+			cos = 1.27323954 * newAngle + 0.405284735 * newAngle * newAngle
+		} else {
+			cos = 1.27323954 * newAngle - 0.405284735 * newAngle * newAngle;
+		}
+		
 		var vectorSpeed = this.speed + this.speedRandom * RANDM1TO1();
-		particle.direction = Vector.multiply( vector, vectorSpeed );
+		particle.direction = {"x":vectorSpeed * cos, "y":vectorSpeed * sin};
 
 		particle.size = this.size + this.sizeRandom * RANDM1TO1();
 		particle.size = particle.size < 0 ? 0 : ~~particle.size;
@@ -140,8 +171,16 @@ function cParticleSystem(){
 			if( currentParticle.timeToLive > 0 ){
 
 				// Calculate the new direction based on gravity
-				currentParticle.direction = Vector.add( currentParticle.direction, this.gravity );
-				currentParticle.position = Vector.add( currentParticle.position, currentParticle.direction );
+				var dx = currentParticle.direction.x;
+				var dy = currentParticle.direction.y;
+				currentParticle.direction = {
+					"x": dx + this.gravity.x,
+					"y": dy + this.gravity.y
+				};
+				currentParticle.position = {
+					"x": currentParticle.position.x + dx,
+					"y": currentParticle.position.y + dy
+				};
 				currentParticle.timeToLive -= delta;
 
 				// Update colours based on delta
@@ -182,7 +221,7 @@ function cParticleSystem(){
 			var halfSize = size >> 1;
 			var x = ~~particle.position.x;
 			var y = ~~particle.position.y;
-					
+			
 			var radgrad = context.createRadialGradient( x + halfSize, y + halfSize, particle.sizeSmall, x + halfSize, y + halfSize, halfSize);  
 			radgrad.addColorStop( 0, particle.drawColour );   
 			radgrad.addColorStop( 1, particle.drawColourTransparent ); //Super cool if you change these values (and add more colour stops)
